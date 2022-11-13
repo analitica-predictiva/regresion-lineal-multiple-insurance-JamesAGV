@@ -79,9 +79,16 @@ def pregunta_03():
     # Importe GridSearchCV
     # Importe Pipeline
     # Importe OneHotEncoder
-    from ____ import ____
-
-    pipeline = ____(
+    #from ____ import ____
+    from sklearn.compose import make_column_selector
+    from sklearn.compose import make_column_transformer
+    from sklearn.feature_selection import SelectKBest
+    from sklearn.feature_selection import f_regression
+    from sklearn.linear_model import LinearRegression
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import OneHotEncoder
+    """"pipeline = ____(
         steps=[
             # Paso 1: Construya un column_transformer que aplica OneHotEncoder a las
             # variables categóricas, y no aplica ninguna transformación al resto de
@@ -108,6 +115,29 @@ def pregunta_03():
                 ____(____),
             ),
         ],
+    )"""
+    pipeline = Pipeline(
+        steps = [
+            ('column_transformer', 
+             make_column_transformer(
+                                    (
+                                    OneHotEncoder(), 
+                                    make_column_selector(dtype_include=object)
+                                    ),
+                                    remainder='passthrough'
+                                    ),
+             ),
+
+            (
+                'selectKBest',
+                SelectKBest(score_func=f_regression),
+            ),
+            (
+                'linearRegression',
+                LinearRegression(),
+            ),
+
+        ],
     )
 
     # Cargua de las variables.
@@ -115,20 +145,31 @@ def pregunta_03():
 
     # Defina un diccionario de parámetros para el GridSearchCV. Se deben
     # considerar valores desde 1 hasta 11 regresores para el modelo
-    param_grid = {
+    """param_grid = {
         ____: ____(____, ____),
-    }
+    }"""
+    param_grid = {
+       'selectKBest__k': range(1,12)
+    }    
 
     # Defina una instancia de GridSearchCV con el pipeline y el diccionario de
     # parámetros. Use cv = 5, y como métrica de evaluación el valor negativo del
     # error cuadrático medio.
-    gridSearchCV = ____(
+    """gridSearchCV = ____(
         estimator=____,
         param_grid=____,
         cv=____,
         scoring=____,
         refit=____,
         return_train_score=____,
+    )"""
+    gridSearchCV = GridSearchCV(
+        estimator=pipeline,
+        param_grid=param_grid,
+        cv=5,
+        scoring='neg_mean_squared_error',
+        refit=True,
+        return_train_score=True,
     )
 
     # Búsque la mejor combinación de regresores
